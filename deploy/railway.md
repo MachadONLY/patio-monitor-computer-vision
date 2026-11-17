@@ -8,7 +8,7 @@ Use Railway com um serviço **Docker** conectado ao repositório
 `MachadONLY/patio-monitor-computer-vision`, branch `main`.
 O Dockerfile na raiz é detectado automaticamente. A aplicação é executada como usuário sem privilégios, com apenas um worker e o modelo Qwen quantizado no próprio contêiner.
 
-**Recurso necessário:** permita pelo menos **2 GB RAM** para a API, modelo e interface. Não use o plano Free/Trial com 0,5–1 GB como se isso garantisse o funcionamento. Railway Hobby tem cobrança mínima e uso variável; confirme preços e limites antes de habilitar uma assinatura. Não configure pagamentos sem autorização do responsável pela conta.
+**Memória testada:** o contêiner foi iniciado com limite de **512 MB** no GitHub Actions e respondeu ao teste real de Qwen, vídeo, API e GPS. A memória observada após a resposta foi cerca de **232 MiB**. Isso comprova o teste de um acesso, não estabilidade em carga ou disponibilidade durante a semana. O plano gratuito regular Railway tem limite de 512 MB e créditos de uso restritos, que podem se esgotar. Para uma semana de correção sem risco de suspensão por cota, considere um plano Hobby e monitore a cobrança; a assinatura exige autorização explícita do titular.
 
 ## Configuração
 
