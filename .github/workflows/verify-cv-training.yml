@@ -1,0 +1,49 @@
+name: Independent Computer Vision training reproduction
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/verify-cv-training.yml
+permissions:
+  contents: read
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install scientific runtime
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install -r services/vision/requirements.txt
+          python -m pip install pytest==9.2.0
+      - name: Run train/tracking unit tests
+        run: python -m pytest -q services/vision/test_tracking.py
+      - name: Download licensed, hash-verified source videos
+        run: python -m services.vision prepare --data /tmp/patio-vision-data
+      - name: Train custom detector from scratch and evaluate held-out frames
+        run: python -m services.vision train --data /tmp/patio-vision-data --output /tmp/patio-retrained
+      - name: Re-run inference from the freshly trained checkpoint
+        run: python -m services.vision infer --data /tmp/patio-vision-data --output /tmp/patio-retrained
+      - name: Verify reproduction outputs and measured metrics
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json
+          root=Path('/tmp/patio-retrained')
+          metrics=json.loads((root/'metrics.json').read_text())
+          report=json.loads((root/'report.json').read_text())
+          assert metrics['training_frames']==33
+          assert metrics['training_videos']==3
+          assert metrics['test']['frames']==11
+          assert metrics['test']['f1']>0.6,metrics
+          assert metrics['checkpoint_sha256']==hashlib.sha256((root/'bus-heads.npz').read_bytes()).hexdigest()
+          assert report['events']
+          assert (root/'annotated.mp4').stat().st_size>100000
+          print('Fresh retraining passed: test F1',metrics['test']['f1'])
+          PY
