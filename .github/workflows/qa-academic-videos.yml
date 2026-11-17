@@ -1,0 +1,64 @@
+name: Visual QA - final academic videos
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [.github/workflows/qa-academic-videos.yml]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install pillow==12.0.0
+      - name: Decode video samples and inspect temporal coverage
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          from PIL import Image, ImageDraw
+          files = [
+            ('IA Generativa', Path('docs/gs/genai/demonstracao.mp4'), [2, 9, 17, 28, 42, 53]),
+            ('Computer Vision', Path('docs/gs/cv/Patio-Monitor-Demonstracao-Visao.mp4'), [2, 9, 17, 27, 41, 52]),
+          ]
+          out=Path('release-qa');out.mkdir(exist_ok=True)
+          montage=Image.new('RGB',(1380,1540),'white')
+          draw=ImageDraw.Draw(montage)
+          report={}
+          for group,(title,source,seconds) in enumerate(files):
+            data=json.loads(subprocess.check_output([
+              'ffprobe','-v','error','-show_entries','format=duration:stream=width,height,codec_name',
+              '-of','json',str(source)],text=True))
+            duration=float(data['format']['duration'])
+            assert duration >= 50
+            assert any(s.get('width')==1280 and s.get('height')==720 and s.get('codec_name')=='h264'
+              for s in data['streams'])
+            report[title]={'seconds':duration,'size_bytes':source.stat().st_size}
+            for i,sec in enumerate(seconds):
+              target=out/f'{group}-{i}.png'
+              subprocess.run(['ffmpeg','-loglevel','error','-y','-ss',str(sec),'-i',str(source),
+                '-frames:v','1',str(target)],check=True)
+              im=Image.open(target).convert('RGB')
+              assert im.size==(1280,720)
+              im.thumbnail((660,355))
+              x=20+(i%2)*690;y=20+group*770+(i//2)*250
+              im.thumbnail((660,220))
+              montage.paste(im,(x,y+25))
+              draw.text((x,y+4),f'{title} - {sec}s',fill='black')
+          montage.save(out/'final-videos-contact.jpg',quality=85)
+          (out/'manifest.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          print(json.dumps(report))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: academic-video-visual-qa
+          path: release-qa/
+          retention-days: 3
