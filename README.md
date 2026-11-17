@@ -8,6 +8,14 @@ Componente de câmera que detecta ônibus em vídeo, acompanha os veículos e re
 
 O Pátio Monitor acompanha ônibus pelo GPS e ajuda a revisar divergências entre escala e portaria. A tela abre no Terminal Alvorada, com a implantação em 3D, posições do BRT do Rio e acesso direto à gravação analisada e à revisão de turno.
 
+## Teste direto para o professor
+
+1. Abra o MVP pelo link público informado no Teams e clique em **Câmera do portão** (ou escolha **Ver gravação** na última etapa do tour).
+2. Reproduza o vídeo de referência anotado e clique no cruzamento **Esquerda → direita, 00:07,4**. O player deve navegar até a detecção real e exibir a confiança do detector.
+3. Para conferir treinamento e avaliação customizados, abra [pesos, código e anotações](services/vision/README.md) e [resultados com validação e teste separados](services/vision/artifacts/metrics.json). O modelo foi treinado sobre características e propostas da YOLOX congelada; o resultado exibido é uma gravação processada, não uma câmera de portaria ao vivo.
+
+[Prova do teste real no navegador](docs/gs/cv/prova-video-tour.png) · [Relatório PDF](docs/gs/cv/Patio-Monitor-Applied-Computer-Vision.pdf) · [Vídeo demonstrativo](docs/gs/cv/Patio-Monitor-Demonstracao-Visao.mp4).
+
 ## Ficha técnica
 
 | Campo | Pátio Monitor |
