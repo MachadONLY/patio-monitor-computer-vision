@@ -232,7 +232,7 @@ test("crossing panel shows observed entry and exit metrics only when supplied by
     summary: { windowHours: 24, entries: 3, exits: 2, paired: 2, averageMinutes: 18.5 },
   });
   await page.getByRole("button", { name: "Entradas e saídas", exact: true }).click();
-  const summary = page.getByRole("group", { name: "Resumo GPS das últimas 24 horas" });
+  const summary = page.locator(".crossing-overview");
   await expect(summary).toContainText("Entradas");
   await expect(summary).toContainText("Saídas");
   await expect(summary).toContainText("18,5 min");
