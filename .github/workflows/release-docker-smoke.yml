@@ -19,7 +19,7 @@ jobs:
         run: docker build --pull -t patio-monitor-release:test .
       - name: Start exact deployment image
         run: |
-          docker run -d --name patio-release --memory 3g -p 127.0.0.1:18765:8000 \
+          docker run -d --name patio-release --memory 1g -p 127.0.0.1:18765:8000 \
             -e PORT=8000 -e PATIO_LIVE_PROVIDER=rio_brt \
             patio-monitor-release:test
           for i in $(seq 1 45); do
@@ -59,6 +59,8 @@ jobs:
           assert not ans["refused"] and any(c["id"]=="p02" for c in ans["citations"]),ans
           print("Docker smoke accepted: HTML, actual video, live GPS source and Qwen p02")
           PY
+      - name: Capture resource use with 1GB memory limit
+        run: docker stats --no-stream patio-release
       - name: Inspect container and logs on failure
         if: failure()
         run: |
