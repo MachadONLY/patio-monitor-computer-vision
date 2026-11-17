@@ -1,0 +1,33 @@
+name: Release source and built frontend for independent QA
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [.github/workflows/release-qa-bundle.yml]
+permissions:
+  contents: read
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install -g pnpm@11.25.0
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Archive tracked sources and compiled frontend
+        run: |
+          git archive --format=tar.gz --output=source.tar.gz HEAD
+          tar -czf frontend-dist.tar.gz -C apps/web dist
+          sha256sum source.tar.gz frontend-dist.tar.gz > SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qa-source-and-frontend
+          path: |
+            source.tar.gz
+            frontend-dist.tar.gz
+            SHA256SUMS
+          retention-days: 3
