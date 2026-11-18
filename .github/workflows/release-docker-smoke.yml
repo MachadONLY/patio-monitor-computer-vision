@@ -7,6 +7,11 @@ on:
       - Dockerfile
       - deploy/start-public.sh
       - .github/workflows/release-docker-smoke.yml
+  pull_request:
+    paths:
+      - Dockerfile
+      - deploy/start-public.sh
+      - .github/workflows/release-docker-smoke.yml
 permissions:
   contents: read
 jobs:
@@ -17,10 +22,13 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build deployment Docker image with Qwen and frontend
         run: docker build --pull -t patio-monitor-release:test .
-      - name: Start exact deployment image
+      - name: Start exact deployment image with a root-owned persistent mount
         run: |
+          mkdir -p "$RUNNER_TEMP/patio-history"
+          chmod 0700 "$RUNNER_TEMP/patio-history"
           docker run -d --name patio-release --memory 512m -p 127.0.0.1:18765:8000 \
             -e PORT=8000 -e PATIO_LIVE_PROVIDER=rio_brt \
+            -v "$RUNNER_TEMP/patio-history:/srv/patio/data" \
             patio-monitor-release:test
           for i in $(seq 1 45); do
             if curl --fail --silent http://127.0.0.1:18765/health >/dev/null; then
@@ -61,6 +69,23 @@ jobs:
           PY
       - name: Capture resource use with 512MB memory limit
         run: docker stats --no-stream patio-release
+      - name: Verify writable history volume, unprivileged server and restart
+        run: |
+          docker exec patio-release sh -c 'grep -E "^Uid:[[:space:]]+10001" /proc/1/status'
+          docker exec patio-release python -c 'import os,sqlite3; p="/srv/patio/data/observations.sqlite3"; assert os.path.isfile(p); assert os.stat(p).st_uid == 10001; assert sqlite3.connect(p).execute("pragma integrity_check").fetchone()[0] == "ok"'
+          docker rm -f patio-release
+          docker run -d --name patio-release --memory 512m -p 127.0.0.1:18765:8000 \
+            -e PORT=8000 -e PATIO_LIVE_PROVIDER=rio_brt \
+            -v "$RUNNER_TEMP/patio-history:/srv/patio/data" \
+            patio-monitor-release:test
+          for i in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:18765/health >/dev/null; then
+              break
+            fi
+            sleep 2
+          done
+          docker exec patio-release python -c 'import os,sqlite3; p="/srv/patio/data/observations.sqlite3"; assert os.path.isfile(p); assert os.stat(p).st_uid == 10001; assert sqlite3.connect(p).execute("pragma integrity_check").fetchone()[0] == "ok"'
+          echo "PASS: persisted SQLite across restart with unprivileged FastAPI."
       - name: Inspect container and logs on failure
         if: failure()
         run: |

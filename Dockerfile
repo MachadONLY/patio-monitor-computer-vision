@@ -19,7 +19,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PATIO_ARCHIVE_FILE=/srv/patio/data/observations.sqlite3
 WORKDIR /srv/patio
 RUN apt-get update -qq \
-    && apt-get install -y --no-install-recommends ca-certificates libgomp1 libstdc++6 \
+    && apt-get install -y --no-install-recommends ca-certificates libgomp1 libstdc++6 gosu \
     && rm -rf /var/lib/apt/lists/*
 COPY services/api/requirements.txt services/api/requirements-ai.txt /tmp/
 RUN python -m pip install --no-cache-dir -r /tmp/requirements.txt \
@@ -36,6 +36,7 @@ COPY deploy/start-public.sh ./start-public.sh
 RUN install -d -m 0750 -o 10001 -g 10001 /srv/patio/data \
     && chmod 0555 /srv/patio/start-public.sh \
     && chmod -R a+rX /srv/patio/web /srv/patio/vision /srv/patio/app /srv/patio/gs
-USER 10001:10001
+# Start as root only to fix the mount ownership; start-public.sh drops to 10001.
+USER 0:0
 EXPOSE 8000
 CMD ["/bin/sh", "/srv/patio/start-public.sh"]
