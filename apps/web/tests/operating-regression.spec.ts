@@ -238,3 +238,23 @@ test("crossing panel shows observed entry and exit metrics only when supplied by
   await expect(summary).toContainText("18,5 min");
   await expect(summary).toContainText("2 pares GPS");
 });
+
+
+test("closed crossing panel does not issue repeated production requests", async ({ page }) => {
+  let crossingRequests = 0;
+  page.on("request", req => {
+    if (new URL(req.url()).pathname === "/api/vehicles/terminal-crossings") crossingRequests += 1;
+  });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await startOperatingPage(page, snapshot([gpsSample(new Date().toISOString())]));
+  await expect(page.locator(".viewport")).toHaveAttribute("data-ready", "true", { timeout: 20_000 });
+  await page.waitForTimeout(500);
+  expect(crossingRequests).toBe(0);
+  await page.getByRole("button", { name: "Entradas e saídas", exact: true }).click();
+  await expect.poll(() => crossingRequests).toBeGreaterThan(0);
+  await expect(page.getByRole("heading", { name: "Entradas e saídas" })).toBeVisible();
+  const current = crossingRequests;
+  await page.getByRole("button", { name: "Voltar à frota" }).click();
+  await page.waitForTimeout(800);
+  expect(crossingRequests).toBe(current);
+});

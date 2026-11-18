@@ -218,7 +218,7 @@ function App() {
                   setShowCrossings(false);
                   requestAnimationFrame(() => crossingsEntry.current?.focus({ preventScroll: true }));
                 }}><ArrowLeft size={15} /> Voltar à frota</button>
-                <TerminalCrossings enabled={hasTerminal} onSelect={selectVehicle} activeVehicleIds={new Set(vehicles.map(({ id }) => id))} />
+                <TerminalCrossings enabled={hasTerminal && showCrossings && tourStep === null} onSelect={selectVehicle} activeVehicleIds={new Set(vehicles.map(({ id }) => id))} />
               </div>
               {(!showCrossings || !hasTerminal) && (vehicle ? (
                 <VehicleInspector key={vehicle.id} vehicle={vehicle} mode="LIVE" site={site} area={area} elapsed={0}
