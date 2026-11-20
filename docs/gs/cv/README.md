@@ -38,3 +38,12 @@ Para regenerar o PDF com seu texto e imagens versionados, instale ReportLab e as
 ```sh
 python docs/gs/cv/montar_relatorio.py docs/gs/cv/relatorio-conteudo.json docs/gs/cv/Patio-Monitor-Applied-Computer-Vision.pdf
 ```
+
+## Evidências de execução e integridade
+
+- [Auditoria técnica do material publicado](https://github.com/MachadONLY/patio-monitor-computer-vision/actions/runs/44647154224): verifica o PDF real de quatro páginas, a contagem exata de 250 palavras no resumo e 50 no objetivo, integrantes, seções, link para este repositório, taxas medidas, pesos, hashes e mídia.
+- [Validação da mídia em FFmpeg](https://github.com/MachadONLY/patio-monitor-computer-vision/actions/runs/44646804290): a demonstração principal foi decodificada em H.264 1280×720, com duração de 55,92 s.
+- [Gravação real da interface pública](https://github.com/MachadONLY/patio-monitor-computer-vision/actions/runs/44646773873): o navegador carregou a gravação processada, reproduziu o vídeo, selecionou o cruzamento em 7,44 s e conferiu a fonte original.
+- [Teste automatizado de construção e interface](https://github.com/MachadONLY/patio-monitor-computer-vision/actions/runs/44626224526): suíte de API, detector, build e navegador aprovada.
+
+O vídeo de prova é uma **gravação processada**, não uma câmera de portaria ao vivo; o experimento utiliza vídeos públicos licenciados. O relatório documenta a qualidade da detecção nas amostras de treino, validação e teste, além das limitações de generalização.
