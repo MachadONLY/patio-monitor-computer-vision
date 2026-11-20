@@ -1,0 +1,63 @@
+name: Capture and publish actual Computer Vision browser test
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-cv-real-browser.yml
+      - apps/web/scripts/capture-cv-real.mjs
+permissions:
+  contents: write
+jobs:
+  vision-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install reproducible browser and media tooling
+        run: |
+          npm install -g pnpm@11.25.0
+          pnpm install --frozen-lockfile
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pnpm --filter @patio/web exec playwright install --with-deps chromium
+      - name: Play actual annotated video and inspect detected crossing on public domain
+        run: pnpm --filter @patio/web exec node scripts/capture-cv-real.mjs
+      - name: Validate final recorded MP4 and duration
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          p=Path('docs/gs/cv/demonstracao-cv-navegador-real.mp4')
+          assert p.is_file() and p.stat().st_size > 200000
+          meta=json.loads(subprocess.check_output(['ffprobe','-loglevel','error',
+            '-show_entries','format=duration:stream=codec_name,width,height',
+            '-of','json',str(p)],text=True))
+          seconds=float(meta['format']['duration'])
+          assert seconds>=35, meta
+          assert any(x.get('codec_name')=='h264' and x.get('width')==1280
+                     and x.get('height')==720 for x in meta['streams'])
+          print('CV real web walkthrough:',seconds,'seconds,',p.stat().st_size,'bytes')
+          PY
+      - name: Publish evidence to public project
+        run: |
+          git config user.name "Gabriel Teixeira Machado"
+          git config user.email "rm551570@fiap.com.br"
+          git add docs/gs/cv/demonstracao-cv-navegador-real.mp4
+          if ! git diff --cached --quiet; then
+            git commit -m "docs(cv): vídeo real do detector em uso no navegador"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cv-browser-video
+          path: |
+            docs/gs/cv/demonstracao-cv-navegador-real.mp4
+            apps/web/test-results/cv-real-recording/
+          if-no-files-found: warn
+          retention-days: 7
