@@ -1,3 +1,4 @@
+# Verificação de release final GS 2026.2: confirmar integridade e reprodução.
 name: Independent Computer Vision training reproduction
 on:
   workflow_dispatch:
