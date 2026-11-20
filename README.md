@@ -1,4 +1,10 @@
 # Pátio Monitor · Applied Computer Vision
+**Integrantes**
+
+- Gabriel Teixeira Machado — RM551570
+- Felipe Bressani — RM97688
+- Camila do Prado Padalino — RM98316
+
 
 FIAP · Global Solution 2026.2 · Engenharia de Software
 
