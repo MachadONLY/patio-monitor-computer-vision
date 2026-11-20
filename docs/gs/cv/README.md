@@ -17,7 +17,8 @@ O enunciado oficial detalha a disciplina nas páginas 43–44. O prazo geral é 
 Código completo em [MachadONLY/patio-monitor-computer-vision](https://github.com/MachadONLY/patio-monitor-computer-vision).
 
 - [Relatório técnico em PDF](Patio-Monitor-Applied-Computer-Vision.pdf)
-- [Demonstração do aplicativo em MP4](Patio-Monitor-Demonstracao-Visao.mp4)
+- [Demonstração técnica em MP4: arquitetura, vídeo anotado e métricas](Patio-Monitor-Demonstracao-Visao.mp4)
+- [Gravação do aplicativo público com navegação real pelo cruzamento](demonstracao-cv-navegador-real.mp4)
 - [Implementação, dados anotados e reprodução](../../../services/vision/)
 - [Métricas da avaliação](../../../services/vision/artifacts/metrics.json) e [relatório de cruzamentos](../../../services/vision/artifacts/report.json)
 
@@ -25,7 +26,7 @@ Para analisar uma gravação própria, use o [fluxo de inferência operacional](
 
 ## Roteiro de demonstração
 
-1. Abra a área de câmera no Pátio Monitor e mostre a origem da gravação e o modelo treinado.
+1. Na [plataforma pública](https://patio-monitor-production.up.railway.app/), abra **Câmera do portão** e confira a procedência da gravação e o modelo treinado.
 2. Reproduza um trecho em que a inferência marque os ônibus. Mostre o cruzamento da linha e o sentido da passagem.
 3. Selecione o cruzamento para levar o player a 7,44 s e confira a evidência na própria gravação.
 4. Consulte a avaliação no PDF, com um acerto de teste, um falso positivo de validação e os limites da amostra.
