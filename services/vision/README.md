@@ -39,6 +39,19 @@ python -m pytest -q services/vision/test_tracking.py
 
 [Vídeo anotado](artifacts/annotated.mp4) · [Quadro da passagem](artifacts/crossing-01.jpg) · [Relatório](artifacts/report.json) · [Métricas](artifacts/metrics.json) · [Cabeças treinadas](artifacts/bus-heads.npz)
 
+## Reproduzir com arquivos originais já baixados
+
+O treinamento usa cinco vídeos de terceiros com URL, licença e SHA-256 registrados em [dataset.json](dataset.json). Quando o Wikimedia Commons limita downloads automatizados (HTTP 429), é possível obter os arquivos originais pelo navegador, sem trocar a base de treino por gravações diferentes.
+
+1. Abra em um navegador as páginas `source_url` de cada uma das cinco entradas de `dataset.json` e baixe a **gravação original** correspondente (sem edição ou recompressão).
+2. Salve os arquivos em `.cache/patio-vision/` com estes nomes exatos: `croydon.webm`, `tottenham.webm`, `toulouse.webm`, `london.webm` e `prague.webm`.
+3. Execute `python -m services.vision prepare --data .cache/patio-vision`. O programa reutiliza cada arquivo existente **somente após conferir seu SHA-256** com o manifesto; se estiver incorreto, interrompe a execução.
+4. Continue com `python -m services.vision train --data .cache/patio-vision` e `python -m services.vision infer --data .cache/patio-vision`. O detector treina as duas cabeças específicas sobre as propostas da YOLOX congelada. A rede YOLOX de base não é retreinada.
+
+Esse caminho evita novas requisições aos cinco vídeos que já estiverem no cache. Se algum arquivo estiver faltando, a etapa `prepare` ainda tentará baixá-lo, e um HTTP 429 poderá impedir a reprodução. Não trate falha de download como falha de inferência, nem substitua os vídeos por arquivos distintos: o hash impede misturar conjuntos diferentes.
+
+A [auditoria independente dos artefatos entregues](../../gs/audit_cv_rubric.py) verifica o PDF, o vídeo demonstrativo, a procedência, os pesos, os relatórios e os hashes, sem baixar fontes externas. Ela **não substitui** a reprodução integral do treinamento.
+
 ## Processar uma gravação operacional
 
 A partir da raiz, informe o vídeo de câmera fixa, o identificador da gravação e a posição da linha como fração da largura. Escolha um diretório novo por gravação. O comando usa as cabeças treinadas versionadas se o diretório de saída ainda não tem seus próprios pesos.
