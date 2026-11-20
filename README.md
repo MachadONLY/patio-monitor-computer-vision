@@ -4,13 +4,13 @@ FIAP · Global Solution 2026.2 · Engenharia de Software
 
 Componente de câmera que detecta ônibus em vídeo, acompanha os veículos e registra direção, instante e quadro de cada cruzamento de uma linha virtual.
 
-[Relatório técnico em PDF](docs/gs/cv/Patio-Monitor-Applied-Computer-Vision.pdf) · [Treino e inferência](services/vision/README.md) · [Métricas](services/vision/artifacts/metrics.json) · [Vídeo](docs/gs/cv/Patio-Monitor-Demonstracao-Visao.mp4)
+[Relatório técnico em PDF](docs/gs/cv/Patio-Monitor-Applied-Computer-Vision.pdf) · [Vídeo técnico (detecção e métricas)](docs/gs/cv/Patio-Monitor-Demonstracao-Visao.mp4) · [Gravação real da plataforma](docs/gs/cv/demonstracao-cv-navegador-real.mp4) · [Treino e inferência](services/vision/README.md) · [Métricas](services/vision/artifacts/metrics.json)
 
 O Pátio Monitor acompanha ônibus pelo GPS e ajuda a revisar divergências entre escala e portaria. A tela abre no Terminal Alvorada, com a implantação em 3D, posições do BRT do Rio e acesso direto à gravação analisada e à revisão de turno.
 
-## Teste direto 
+## Verificação no navegador
 
-1. Abra o MVP pelo link público informado no Teams e clique em **Câmera do portão** (ou escolha **Ver gravação** na última etapa do tour).
+1. Abra a [plataforma publicada](https://patio-monitor-production.up.railway.app/) em uma janela anônima e clique em **Câmera do portão** (ou escolha **Ver gravação** no tour guiado).
 2. Reproduza o vídeo de referência anotado e clique no cruzamento **Esquerda → direita, 00:07,4**. O player deve navegar até a detecção real e exibir a confiança do detector.
 3. Para conferir treinamento e avaliação customizados, abra [pesos, código e anotações](services/vision/README.md) e [resultados com validação e teste separados](services/vision/artifacts/metrics.json). O modelo foi treinado sobre características e propostas da YOLOX congelada; o resultado exibido é uma gravação processada, não uma câmera de portaria ao vivo.
 
