@@ -45,7 +45,7 @@ O recuperador remove acentos e palavras funcionais, aplica aliases simples de do
 
 Em perguntas livres de alta cobertura, o agente permite uma resposta composta exclusivamente de um trecho recuperado. Essa trilha exige cobertura a partir de 0,68 e uma diferença de pelo menos 0,16 para o segundo lugar. Uma ocorrência tipada usa o procedimento mais relacionado ao seu motivo. O modelo escolhe frases ou pares contíguos de frases do trecho. A aplicação valida fontes e recusa antes de devolver a resposta.
 
-O experimento usa um corpus fixo para permitir a reprodução das métricas. Nele, o trecho `p05` descreve o LIVE com o Olho Vivo. Na plataforma, o LIVE também pode consultar o feed público do BRT do Rio sem autenticação. A fonte ativa aparece no painel e na [documentação dos modos](../../README.md#modos-de-dados).
+O experimento usa um corpus fixo para permitir a reprodução das métricas. Nele, o trecho `p05` descreve o LIVE com o Olho Vivo. Na plataforma, o LIVE também pode consultar o feed público do BRT do Rio sem autenticação. A fonte ativa aparece no painel e na [documentação dos modos](../../README.md#origem-das-posições-e-histórico).
 
 ## Protocolo
 
